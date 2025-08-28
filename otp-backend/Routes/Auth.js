@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const auth = require('../middleware/auth');
+const User = require('./Models/User');
+const auth = require('./Routes/Auth');
 const crypto = require("crypto");
 
 // Temporary store for OTPs (in-memory)
@@ -209,5 +209,23 @@ router.post("/reset-password", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
+const authMiddleware = async (req, res, next) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) return res.status(401).json({ success: false, message: "No token provided" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) return res.status(401).json({ success: false, message: "User not found" });
+
+    req.user = user; // attach user to request
+    next();
+  } catch (error) {
+    res.status(401).json({ success: false, message: "Invalid token" });
+  }
+};
+
 
 module.exports = router;
