@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+
 const app = express();
 
 // Middleware
@@ -496,7 +497,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
